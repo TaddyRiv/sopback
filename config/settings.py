@@ -1,23 +1,25 @@
 import os
 from pathlib import Path
 from corsheaders.defaults import default_headers
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+from dotenv import load_dotenv
+
+load_dotenv()
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# ==============================
+# 🔐 SEGURIDAD / ENTORNO
+# ==============================
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
+SECRET_KEY = os.environ.get('SECRET_KEY', 'dev-secret-key')
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-lw7x-1nvla*6zd5&em!j2q5!&-d$l3@g&s)f(3j6e5nzyy(8vq'
+DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '*').split(',')
 
-ALLOWED_HOSTS = []
-
-
-# Application definition
+# ==============================
+# 📦 APLICACIONES
+# ==============================
 
 INSTALLED_APPS = [
     "corsheaders",
@@ -34,32 +36,45 @@ INSTALLED_APPS = [
     'apps.productos',
     'apps.ventas',
     'apps.auditoria',
-    
 ]
 
+# ==============================
+# ⚙️ MIDDLEWARE (orden IMPORTANTE)
+# ==============================
+
 MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # 👈 importante para Render
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-import os
+# ==============================
+# 🌍 CORS
+# ==============================
 
 CORS_ALLOW_ALL_ORIGINS = True
-
 CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOW_HEADERS = list(default_headers) + [
     'authorization',
 ]
 
+# ==============================
+# 🔗 URLs / WSGI
+# ==============================
+
 ROOT_URLCONF = 'config.urls'
+WSGI_APPLICATION = 'config.wsgi.application'
+
+# ==============================
+# 🧠 TEMPLATES
+# ==============================
 
 TEMPLATES = [
     {
@@ -76,8 +91,9 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'config.wsgi.application'
-
+# ==============================
+# 🔐 JWT
+# ==============================
 
 from datetime import timedelta
 
@@ -92,54 +108,47 @@ SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
+# ==============================
+# 🗄️ BASE DE DATOS (SUPABASE)
+# ==============================
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
-        'USER': 'postgres.lamriekadvrvcsjdffcb',
-        'PASSWORD': 'tuputamadre3200',
-        'HOST': 'aws-1-us-east-1.pooler.supabase.com',
-        'PORT': '6543',
+        'NAME': os.environ.get('DB_NAME', 'postgres'),
+        'USER': os.environ.get('DB_USER'),
+        'PASSWORD': os.environ.get('DB_PASSWORD'),
+        'HOST': os.environ.get('DB_HOST'),
+        'PORT': os.environ.get('DB_PORT', '6543'),
         'OPTIONS': {
             'sslmode': 'require',
         },
     }
 }
 
-
-# Password validation
-# https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
+# ==============================
+# 🔑 VALIDACIONES
+# ==============================
 
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-
-# Internationalization
-# https://docs.djangoproject.com/en/6.0/topics/i18n/
+# ==============================
+# 🌎 INTERNACIONALIZACIÓN
+# ==============================
 
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_TZ = True
 
+# ==============================
+# 📁 STATIC FILES (Render)
+# ==============================
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/6.0/howto/static-files/
-
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
