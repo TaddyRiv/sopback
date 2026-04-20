@@ -26,3 +26,18 @@ class PedidoSerializer(serializers.ModelSerializer):
             'total',
             'detalles'
         ]
+
+class PedidoDetalleListSerializer(serializers.ModelSerializer):
+    producto_nombre = serializers.CharField(source='producto.nombre')
+    pedido_id = serializers.IntegerField(source='pedido.id')
+
+    class Meta:
+        model = PedidoDetalle
+        fields = [
+            'id',
+            'pedido_id',
+            'producto_nombre',
+            'cantidad',
+            'precio_unitario',
+            'subtotal'
+        ]

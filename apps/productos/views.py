@@ -4,10 +4,10 @@ from .serializers import ProductoSerializer, CategoriaSerializer
 
 
 class ProductoViewSet(viewsets.ModelViewSet):
-    queryset = Producto.objects.all()
+    queryset = Producto.objects.all().order_by('-id')
     serializer_class = ProductoSerializer
 
 
 class CategoriaViewSet(viewsets.ModelViewSet):
-    queryset = CategoriaProducto.objects.all()
+    queryset = CategoriaProducto.objects.all().order_by('-id')
     serializer_class = CategoriaSerializer

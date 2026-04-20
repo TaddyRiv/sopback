@@ -11,6 +11,8 @@ from apps.empleados.models import Empleado
 from rest_framework import viewsets
 from .serializers import PedidoSerializer
 
+from .serializers import PedidoDetalleListSerializer
+
 class PedidoViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Pedido.objects.all().order_by('-id')
     serializer_class = PedidoSerializer
@@ -74,3 +76,15 @@ def crear_compra(request):
         except Exception as e:
             return JsonResponse({"error": str(e)}, status=400)
         
+class PedidoDetalleViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = PedidoDetalle.objects.all()
+    serializer_class = PedidoDetalleListSerializer
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        pedido_id = self.request.query_params.get('pedido')
+
+        if pedido_id:
+            queryset = queryset.filter(pedido_id=pedido_id)
+
+        return queryset

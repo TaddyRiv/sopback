@@ -42,5 +42,5 @@ def login_usuario(request):
         return Response({"error": "Usuario no existe"}, status=404)
     
 class EmpleadoViewSet(viewsets.ModelViewSet):
-    queryset = Empleado.objects.all()
+    queryset = Empleado.objects.all().order_by('-id')
     serializer_class = EmpleadoSerializer
